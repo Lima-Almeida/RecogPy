@@ -1,5 +1,5 @@
 # RecogPy
-Facial/Gesture recognition with python.
+Facial/Gesture recognition with python (opencv and mediapipe)
 
 At the current state, this application uses webcam live footage to recognize your hand(s).
 
