@@ -32,17 +32,27 @@ def hand_inclination(hand_landmarks):
 
     return degrees
 
-def finger_states(hand_landmarks):
+def rotate(x, y, angle):
+    x_rot = x * math.cos(angle) - y * math.sin(angle)
+    y_rot = x * math.sin(angle) + y * math.cos(angle)
+    return x_rot, y_rot
+
+def finger_states(hand_landmarks, inclination):
     finger_states = []
     fingertips_ids = [8, 12, 16, 20] #excluding thumb
     bases_ids = [6, 10, 14, 18] #excluding thumb
     thumb_tip_id = 4
     thumb_base_id = 2
 
+    rad = math.radians(inclination)
+
     thumb_tip = hand_landmarks.landmark[thumb_tip_id]
     thumb_base = hand_landmarks.landmark[thumb_base_id]
 
-    if thumb_tip.x < thumb_base.x:
+    thumb_tip_x, thumb_tip_y = rotate(thumb_tip.x, thumb_tip.y, -rad)
+    thumb_base_x, thumb_base_y = rotate(thumb_base.x, thumb_base.y, -rad)
+
+    if thumb_tip_x < thumb_base_x:
         finger_states.append(1)
     else:
         finger_states.append(0)
@@ -50,7 +60,11 @@ def finger_states(hand_landmarks):
     for k in range(len(fingertips_ids)):
         tip = hand_landmarks.landmark[fingertips_ids[k]]
         base = hand_landmarks.landmark[bases_ids[k]]
-        if tip.y < base.y:
+
+        tip_x, tip_y = rotate(tip.x, tip.y, -rad)
+        base_x, base_y = rotate(base.x, base.y, -rad)
+
+        if tip_y < base_y:
             finger_states.append(1)
         else:
             finger_states.append(0)
@@ -78,7 +92,9 @@ while True:
                 mp_hands.HAND_CONNECTIONS
             )
 
-            print(finger_states(hand_landmarks), "{:.2f}".format(hand_inclination(hand_landmarks)))
+            inclination = hand_inclination(hand_landmarks)
+
+            print(finger_states(hand_landmarks, inclination), "{:.2f}".format(inclination))
     
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
