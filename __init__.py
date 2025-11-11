@@ -52,10 +52,16 @@ def finger_states(hand_landmarks, inclination):
     thumb_tip_x, thumb_tip_y = rotate(thumb_tip.x, thumb_tip.y, -rad)
     thumb_base_x, thumb_base_y = rotate(thumb_base.x, thumb_base.y, -rad)
 
-    if thumb_tip_x < thumb_base_x:
-        finger_states.append(1)
+    if hand_landmarks.landmark[5].x < hand_landmarks.landmark[17].x:
+        if thumb_tip_x < thumb_base_x:
+            finger_states.append(1)
+        else:
+            finger_states.append(0)
     else:
-        finger_states.append(0)
+        if thumb_tip_x > thumb_base_x:
+            finger_states.append(1)
+        else:
+            finger_states.append(0)
 
     for k in range(len(fingertips_ids)):
         tip = hand_landmarks.landmark[fingertips_ids[k]]
